@@ -1,5 +1,5 @@
 import express from 'express'
-import { chatReply, clearChatContext } from './chatgpt'
+import { chatReply, clearChatContext } from '../src/chatgpt'
 
 const app = express()
 
