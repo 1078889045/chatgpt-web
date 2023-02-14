@@ -28,7 +28,7 @@ async function chatReply(message: string) {
 
   try {
     // Get the last context from the chat context
-    let options: SendMessageOptions = {}
+    let options: SendMessageOptions = { timeoutMs : 20000}
 
     const lastContext = Array.from(chatContext).pop()
 

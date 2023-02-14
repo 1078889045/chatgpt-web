@@ -38,5 +38,6 @@
     "unplugin",
     "VITE",
     "vueuse"
-  ]
+  ],
+  "python.formatting.provider": "yapf"
 }
