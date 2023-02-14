@@ -20,7 +20,7 @@ const chatContext = new Set<ChatContext>()
 /**
  * More Info: https://github.com/transitive-bullshit/chatgpt-api
  */
-const api = new ChatGPTAPI({ apiKey })
+const api = new ChatGPTAPI({ apiKey, maxResponseTokens: 20000 })
 
 async function chatReply(message: string) {
   if (!message)
@@ -56,7 +56,7 @@ async function chatReplayOne(message: string, options?: ChatContext) {
     return sendResponse({ type: 'Fail', message: 'Message is empty' })
 
   try {
-    let messageOptions: SendMessageOptions = {}
+    let messageOptions: SendMessageOptions = { timeoutMs : 20000}
 
     if (options) {
       const { conversationId, parentMessageId } = options
