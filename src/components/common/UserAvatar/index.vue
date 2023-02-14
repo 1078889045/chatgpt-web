@@ -9,7 +9,7 @@ import { GithubSite } from '@/components/custom'
     </div>
     <div class="ml-2">
       <h2 class="font-bold text-md">
-        ChenZhaoYu
+        POM ZHU
       </h2>
       <p class="text-xs text-gray-500">
         <GithubSite />
