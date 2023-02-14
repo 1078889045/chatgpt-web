@@ -28,3 +28,5 @@ coverage
 *.sln
 *.sw?
 .env
+service/build/index.js
+service/build/index.js.map
