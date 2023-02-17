@@ -2,28 +2,28 @@
 
 使用 express 和 vue3 搭建的 ChartGPT 演示网页
 
-![cover](./docs/cover-2.png)
+![PC](./docs/cover.png)
 
 > 提示：目前 `OpenAI` 开放的模型最高只有 `GPT-3`，和现在网页所使用的 `GPT-3.5` 或 `GPT-4` 有很大差距，需要等官方开放最新的模型接口。
 
 ## 待实现路线
-[x] 多会话储存和上下文逻辑
+[✓] 多会话储存和上下文逻辑
 
-[x] 对代码等消息类型的格式化美化处理
+[✓] 对代码等消息类型的格式化美化处理
 
-[x] 用户模块（注册、登录、个人中心）
+[✗] 用户模块（注册、登录、个人中心）
 
-[x] 界面多语言
+[✗] 界面多语言
 
-[x] 界面主题
+[✗] 界面主题
 
-[x] More...
+[✗] More...
 
 ## 前置要求
 
 ### Node
 
-`node` 版本需要 >= 18，使用 [nvm](https://github.com/nvm-sh/nvm) 可管理本地多个 `node` 版本
+`node` 需要 `^16 || ^18` 版本（或者 `node >= 14` 需要安装 [fetch polyfill](https://github.com/developit/unfetch#usage-as-a-polyfill)），使用 [nvm](https://github.com/nvm-sh/nvm) 可管理本地多个 `node` 版本
 
 ```shell
 node -v
@@ -36,7 +36,7 @@ npm install pnpm -g
 ```
 
 ### OpenAI API Key
-获取 [OpenAI API key](https://platform.openai.com/overview) 并填写到本地环境变量
+注册并获取 [OpenAI API key](https://platform.openai.com/overview) 并填写到本地环境变量
 ```
 # service/.env 文件
 
@@ -97,8 +97,36 @@ pnpm prod
 
 PS: 不进行打包，直接在服务器上运行 `pnpm start` 也可
 
+## Docker build & run
+
+[参考信息](https://github.com/Chanzhaoyu/chatgpt-web/pull/42)
+
+```bash
+docker build -t chatgpt-web .
+```
+
+## Docker compose
+
+[Hub 地址](https://hub.docker.com/repository/docker/chenzhaoyu94/chatgpt-web/general)
+
+```yml
+version: '3'
+
+services:
+  app:
+    image: chenzhaoyu94/chatgpt-web:main
+    ports:
+      - 3002:3002
+    environment:
+      OPENAI_API_KEY: xxxxxx
+```
+
+
 ### 网页
+
 根目录下运行以下命令，然后将 `dist` 文件夹复制到你的托管服务器上
+
+[参考信息](https://cn.vitejs.dev/guide/static-deploy.html#building-the-app)
 
 ```shell
 pnpm build
@@ -116,6 +144,16 @@ A: 根目录下 `.env` 文件中的 `VITE_GLOB_API_URL` 字段。
 Q: 文件保存时全部爆红?
 
 A: `vscode` 请安装项目推荐插件，或手动安装 `Eslint` 插件。
+
+## 参与贡献
+
+贡献之前请先阅读 [贡献指南](./CONTRIBUTING.md)
+
+感谢所有做过贡献的人!
+
+<a href="https://github.com/Chanzhaoyu/chatgpt-web/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Chanzhaoyu/chatgpt-web" />
+</a>
 
 ## License
 MIT © [ChenZhaoYu](./license)

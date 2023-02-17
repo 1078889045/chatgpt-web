@@ -23,7 +23,9 @@
     "axios",
     "bumpp",
     "chatgpt",
+    "chenzhaoyu",
     "commitlint",
+    "dockerhub",
     "esno",
     "GPTAPI",
     "iconify",
@@ -37,7 +39,7 @@
     "Typecheck",
     "unplugin",
     "VITE",
-    "vueuse"
-  ],
-  "python.formatting.provider": "yapf"
+    "vueuse",
+    "Zhao"
+  ]
 }

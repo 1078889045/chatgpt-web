@@ -1,14 +1,14 @@
+import type { GenericAbortSignal } from 'axios'
 import { post } from '@/utils/request'
 
-export function fetchChatAPI<T = any>(prompt: string) {
+export function fetchChatAPI<T = any>(
+  prompt: string,
+  options?: { conversationId?: string; parentMessageId?: string },
+  signal?: GenericAbortSignal,
+) {
   return post<T>({
     url: '/chat',
-    data: { prompt },
-  })
-}
-
-export function clearConversations<T = any>() {
-  return post<T>({
-    url: '/clear',
+    data: { prompt, options },
+    signal,
   })
 }

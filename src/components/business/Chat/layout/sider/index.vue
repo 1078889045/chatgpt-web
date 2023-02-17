@@ -1,43 +1,36 @@
 <script setup lang='ts'>
-import { ref, watch } from 'vue'
-import { NButton, NLayoutSider, useMessage } from 'naive-ui'
+import { computed, watch } from 'vue'
+import { NButton, NLayoutSider } from 'naive-ui'
 import List from './List.vue'
-import Footer from './Footer.vue'
+import { HoverButton, SvgIcon, UserAvatar } from '@/components/common'
+import { useAppStore, useHistoryStore } from '@/store'
+import { useBasicLayout } from '@/hooks/useBasicLayout'
 
-interface Props {
-  collapsed?: boolean
-}
+const appStore = useAppStore()
+const historyStore = useHistoryStore()
+const { isMobile } = useBasicLayout()
 
-interface Emit {
-  (e: 'update:collapsed', value: boolean): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  collapsed: false,
-})
-
-const emit = defineEmits<Emit>()
-
-const ms = useMessage()
-
-const collapsed = ref(props.collapsed)
-
-watch(
-  () => props.collapsed,
-  (value: boolean) => {
-    collapsed.value = value
-  },
-  { immediate: true },
-)
+const collapsed = computed(() => appStore.siderCollapsed)
 
 function handleAdd() {
-  ms.info('Coming soon...')
+  historyStore.addHistory({
+    title: 'New Chat',
+    isEdit: false,
+    data: [],
+  })
 }
 
-function handleCollapsed() {
-  collapsed.value = !collapsed.value
-  emit('update:collapsed', collapsed.value)
+function handleUpdateCollapsed() {
+  appStore.setSiderCollapsed(!collapsed.value)
 }
+
+watch(
+  isMobile,
+  (val) => {
+    appStore.setSiderCollapsed(val)
+  },
+  { flush: 'post' },
+)
 </script>
 
 <template>
@@ -45,12 +38,13 @@ function handleCollapsed() {
     :collapsed="collapsed"
     :collapsed-width="0"
     :width="260"
-    collapse-mode="width"
-    show-trigger="arrow-circle"
+    :show-trigger="isMobile ? false : 'arrow-circle'"
+    collapse-mode="transform"
+    position="absolute"
     bordered
-    @update:collapsed="handleCollapsed"
+    @update-collapsed="handleUpdateCollapsed"
   >
-    <div class="flex flex-col h-full">
+    <div class="flex flex-col h-full" :class="[{ 'pt-14': isMobile }]">
       <main class="flex-1 min-h-0 overflow-hidden">
         <div class="p-4">
           <NButton dashed block @click="handleAdd">
@@ -59,7 +53,14 @@ function handleCollapsed() {
         </div>
         <List />
       </main>
-      <Footer />
+      <footer class="flex items-center justify-between min-w-0 p-4 overflow-hidden border-t h-[70px]">
+        <UserAvatar />
+        <HoverButton tooltip="Setting">
+          <span class="text-xl text-[#4f555e]">
+            <SvgIcon icon="ri:settings-4-line" />
+          </span>
+        </HoverButton>
+      </footer>
     </div>
   </NLayoutSider>
 </template>
