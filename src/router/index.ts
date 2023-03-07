@@ -1,7 +1,7 @@
 import type { App } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { ChatLayout } from '@/views/chat/layout'
+import { ChatLayout } from '@/views/Chat/layout'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/chat/:uuid?',
         name: 'Chat',
-        component: () => import('@/views/chat/index.vue'),
+        component: () => import('@/views/Chat/index.vue'),
       },
     ],
   },

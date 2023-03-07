@@ -41,8 +41,10 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
     apiModel = 'ChatGPTAPI'
   }
   else {
+    const token = process.env.OPENAI_ACCESS_TOKEN
+
     const options: ChatGPTUnofficialProxyAPIOptions = {
-      accessToken: process.env.OPENAI_ACCESS_TOKEN,
+      accessToken: token,
       debug: false,
     }
 

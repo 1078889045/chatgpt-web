@@ -10,6 +10,8 @@
     "chatbot",
     "express"
   ],
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
   "engines": {
     "node": "^16 || ^18"
   },
@@ -21,7 +23,8 @@
     "clean": "rimraf build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "common:cleanup": "rimraf node_modules && rimraf pnpm-lock.yaml"
+    "common:cleanup": "rimraf node_modules && rimraf pnpm-lock.yaml",
+    "pkg2": "pkg ./pkg.config.json -o build/chatgpt-web-service.exe"
   },
   "dependencies": {
     "chatgpt": "^5.0.4",
