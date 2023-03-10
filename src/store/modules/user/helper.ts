@@ -20,7 +20,7 @@ export function defaultSetting(): UserState {
       // description: 'Star on <a href="https://github.com/Chanzhaoyu/chatgpt-bot" class="text-blue-500" target="_blank" >Github</a>',
       avatar: 'https://raw.githubusercontent.com/1078889045/chatgpt-web/main/src/assets/avatar.jpg',
       name: 'POM ZHU',
-      description: 'Star on <a href="https://github.com/1078889045/chatgpt-bot" class="text-blue-500" target="_blank" >Github</a>',
+      description: 'Star on <a href="https://github.com/1078889045/chatgpt-web" class="text-blue-500" target="_blank" >Github</a>',
     },
   }
 }
