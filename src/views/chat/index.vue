@@ -15,6 +15,8 @@ import { t } from '@/locales'
 
 let controller = new AbortController()
 
+const openLongReply = import.meta.env.VITE_GLOB_OPEN_LONG_REPLY === 'true'
+
 const route = useRoute()
 const dialog = useDialog()
 const ms = useMessage()
@@ -43,7 +45,7 @@ function handleSubmit() {
 }
 
 async function onConversation() {
-  const message = prompt.value
+  let message = prompt.value
 
   if (loading.value)
     return
@@ -90,74 +92,86 @@ async function onConversation() {
   scrollToBottom()
 
   try {
-    await fetchChatAPIProcess<Chat.ConversationResponse>({
-      prompt: message,
-      options,
-      signal: controller.signal,
-      onDownloadProgress: ({ event }) => {
-        const index = dataSources.value.length - 1
-        const xhr = event.target
-        const { responseText } = xhr
-        // Always process the final line
-        const lastIndex = responseText.lastIndexOf('\n')
-        let chunk = responseText
-        if (lastIndex !== -1)
-          chunk = responseText.substring(lastIndex)
-        try {
-          const data = JSON.parse(chunk)
-          const currentChat = getChatByUuidAndIndex(+uuid, index)
-          const currentText = currentChat?.text ?? ''
-          const dataText = data.text ?? ''
-          const appendText = dataText.replace(currentText, '')
-          if (handleChunk.value && appendText && appendText.length > 0) {
-            let i = 0
-            let initialText = currentText
-            const textInterval = setInterval(() => {
-              initialText = currentText + appendText.substring(0, i + 1)
+    let lastText = ''
+    const fetchChatAPIOnce = async () => {
+      await fetchChatAPIProcess<Chat.ConversationResponse>({
+        prompt: message,
+        options,
+        signal: controller.signal,
+        onDownloadProgress: ({ event }) => {
+          const index = dataSources.value.length - 1
+          const xhr = event.target
+          const { responseText } = xhr
+          // Always process the final line
+          const lastIndex = responseText.lastIndexOf('\n')
+          let chunk = responseText
+          if (lastIndex !== -1)
+            chunk = responseText.substring(lastIndex)
+          try {
+            const data = JSON.parse(chunk)
+            const currentChat = getChatByUuidAndIndex(+uuid, index)
+            const currentText = currentChat?.text ?? ''
+            const dataText = data.text ?? ''
+            const appendText = dataText.replace(currentText, '')
+            if (handleChunk.value && appendText && appendText.length > 0) {
+              let i = 0
+              let initialText = currentText
+              const textInterval = setInterval(() => {
+                initialText = currentText + appendText.substring(0, i + 1)
+                updateChat(
+                  +uuid,
+                  index,
+                  {
+                    dateTime: new Date().toLocaleString(),
+                    text: initialText,
+                    inversion: false,
+                    error: false,
+                    loading: false,
+                    conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
+                    requestOptions: { prompt: message, ...options },
+                  },
+                )
+                if (i === 50)
+                  i = appendText.length - 1
+                else
+                  i++
+
+                if (i > appendText.length)
+                  clearInterval(textInterval)
+              }, 100)
+            }
+            else {
               updateChat(
                 +uuid,
                 index,
                 {
                   dateTime: new Date().toLocaleString(),
-                  text: initialText,
+                  text: lastText + data.text ?? '',
                   inversion: false,
                   error: false,
                   loading: false,
                   conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                  requestOptions: { prompt: message, ...options },
+                  requestOptions: { prompt: message, options: { ...options } },
                 },
               )
-              if (i === 50)
-                i = appendText.length - 1
-              else
-                i++
 
-              if (i > appendText.length)
-                clearInterval(textInterval)
-            }, 100)
+              if (openLongReply && data.detail.choices[0].finish_reason === 'length') {
+                options.parentMessageId = data.id
+                lastText = data.text
+                message = ''
+                return fetchChatAPIOnce()
+              }
+            }
+            scrollToBottom()
           }
-          else {
-            updateChat(
-              +uuid,
-              index,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: data.text ?? '',
-                inversion: false,
-                error: false,
-                loading: false,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                requestOptions: { prompt: message, options: { ...options } },
-              },
-            )
-          }
-          scrollToBottom()
-        }
-        catch (error) {
+          catch (error) {
           //
-        }
-      },
-    })
+          }
+        },
+      })
+    }
+
+    await fetchChatAPIOnce()
   }
   catch (error: any) {
     const errorMessage = error?.message ?? t('common.wrong')
@@ -255,52 +269,19 @@ async function onRegenerate(index: number) {
           chunk = responseText.substring(lastIndex)
         try {
           const data = JSON.parse(chunk)
-          const currentChat = getChatByUuidAndIndex(+uuid, index)
-          const currentText = currentChat?.text ?? ''
-          const dataText = data.text ?? ''
-          const appendText = dataText.replace(currentText, '')
-          if (handleChunk.value && appendText && appendText.length > 0) {
-            let i = 0
-            let initialText = currentText
-            const textInterval = setInterval(() => {
-              initialText = currentText + appendText.substring(0, i + 1)
-              updateChat(
-                +uuid,
-                index,
-                {
-                  dateTime: new Date().toLocaleString(),
-                  text: initialText,
-                  inversion: false,
-                  error: false,
-                  loading: false,
-                  conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                  requestOptions: { prompt: message, ...options },
-                },
-              )
-              if (i === 50)
-                i = appendText.length - 1
-              else
-                i++
-
-              if (i > appendText.length)
-                clearInterval(textInterval)
-            }, 100)
-          }
-          else {
-            updateChat(
-              +uuid,
-              index,
-              {
-                dateTime: new Date().toLocaleString(),
-                text: dataText,
-                inversion: false,
-                error: false,
-                loading: false,
-                conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
-                requestOptions: { prompt: message, ...options },
-              },
-            )
-          }
+          updateChat(
+            +uuid,
+            index,
+            {
+              dateTime: new Date().toLocaleString(),
+              text: data.text ?? '',
+              inversion: false,
+              error: false,
+              loading: false,
+              conversationOptions: { conversationId: data.conversationId, parentMessageId: data.id },
+              requestOptions: { prompt: message, ...options },
+            },
+          )
         }
         catch (error) {
           //
