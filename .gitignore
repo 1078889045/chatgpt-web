@@ -31,3 +31,6 @@ coverage
 service/build/index.js
 service/build/index.js.map
 service/.env
+
+# Environment variables files
+/service/.env
